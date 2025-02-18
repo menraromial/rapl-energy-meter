@@ -25,10 +25,6 @@ jobs:
           pyinstaller --onefile --name rapl-energy-meter main.py
           mv dist/rapl-energy-meter .  # Move the binary to the root directory
 
-      - name: Create a ZIP archive of the source code
-        run: |
-          zip -r source_code.zip . -x "source_code.zip" "dist/*" "build/*" "*.spec" ".git/*" ".github/*"
-
       - name: Verify generated files
         run: ls -lh
 
@@ -41,6 +37,5 @@ jobs:
           prerelease: false
           files: |
             rapl-energy-meter  # The executable (moved from dist/)
-            source_code.zip    # The ZIP archive of the source code
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

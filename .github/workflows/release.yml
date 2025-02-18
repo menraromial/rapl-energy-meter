@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest  # Run on the latest Ubuntu environment
+    runs-on: ubuntu-latest  # Run on Ubuntu
 
     steps:
       - name: Checkout repository
@@ -23,13 +23,11 @@ jobs:
       - name: Build the executable
         run: |
           pyinstaller --onefile --name rapl-energy-meter main.py
-          mv dist/rapl-energy-meter .  # Move executable to the root directory
+          mv dist/rapl-energy-meter .  # Move the binary to the root directory
 
       - name: Create a ZIP archive of the source code
         run: |
-          mkdir source_code
-          cp -r ./* source_code/
-          zip -r source_code.zip source_code
+          zip -r source_code.zip . -x "source_code.zip" "dist/*" "build/*" "*.spec" ".git/*" ".github/*"
 
       - name: Verify generated files
         run: ls -lh

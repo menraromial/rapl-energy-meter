@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest  # Run on Ubuntu
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
@@ -23,19 +23,27 @@ jobs:
       - name: Build the executable
         run: |
           pyinstaller --onefile --name rapl-energy-meter main.py
-          mv dist/rapl-energy-meter .  # Move the binary to the root directory
+          mv dist/rapl-energy-meter .  # Move binary to root directory
+
+      - name: Create a ZIP archive of the source code
+        run: |
+          zip -r source_code.zip . -x "source_code.zip" "dist/*" "build/*" "*.spec" ".git/*" ".github/*"
 
       - name: Verify generated files
-        run: ls -lh
+        run: |
+          ls -lh
+          [ -f rapl-energy-meter ] && echo "Executable exists" || echo "ERROR: Executable missing!"
+          [ -f source_code.zip ] && echo "Source code ZIP exists" || echo "ERROR: Source ZIP missing!"
 
       - name: Create a GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.ref_name }}  # Use the current tag
-          name: Release ${{ github.ref_name }}  # Release name
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
           draft: false
           prerelease: false
           files: |
-            rapl-energy-meter  # The executable (moved from dist/)
+            rapl-energy-meter
+            source_code.zip
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}  # Use the new PAT token

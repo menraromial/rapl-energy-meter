@@ -15,16 +15,35 @@ This Python script traces the energy consumption of a specified process using RA
 ## Requirements
 
 - Linux operating system with RAPL support (most modern Intel processors)
-- Python 3.6 or higher
+- Python 3.6 or higher (if using the script)
 - Root privileges (for MSR register access)
 - MSR module enabled (`sudo modprobe msr`)
 
 ## Installation
 
+### Option 1: Using Pre-built Binary
+
+1. Download the pre-built binary:
+```bash
+wget https://github.com/menraromial/rapl-energy-meter/releases/download/v1.0.0/rapl-energy-meter
+```
+
+2. Make the binary executable:
+```bash
+chmod +x rapl-energy-meter
+```
+
+3. Enable the MSR module:
+```bash
+sudo modprobe msr
+```
+
+### Option 2: From Source
+
 1. Clone the repository:
 ```bash
 git clone https://github.com/menraromial/rapl-energy-meter.git
-cd rapl-process-tracer
+cd rapl-energy-meter
 ```
 
 2. Make sure the MSR module is loaded:
@@ -33,6 +52,14 @@ sudo modprobe msr
 ```
 
 ## Usage
+
+### Using the Binary
+
+```bash
+sudo ./rapl-energy-meter PID DURATION [OPTIONS]
+```
+
+### Using the Python Script
 
 Basic usage:
 ```bash
@@ -57,6 +84,10 @@ sudo python3 main.py [-h] [-i INTERVAL] [-v] [--csv] [--output-dir OUTPUT_DIR] p
 
 Monitor process 1234 for 60 seconds with 0.5s sampling interval and CSV export:
 ```bash
+# Using binary
+sudo ./rapl-energy-meter 1234 60 -i 0.5 --csv
+
+# Using Python script
 sudo python3 main.py 1234 60 -i 0.5 --csv
 ```
 
@@ -109,7 +140,7 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the BSD 2-Clause License - see the LICENSE file for details.
 
 ## Acknowledgments
 

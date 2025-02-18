@@ -1,0 +1,48 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - "v*"  # Trigger only when a tag starting with "v" is pushed (e.g., v1.0.0)
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # Run on the latest Ubuntu environment
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Python and PyInstaller
+        run: |
+          sudo apt update
+          sudo apt install -y python3 python3-pip zip
+          pip install --upgrade pip
+          pip install pyinstaller
+
+      - name: Build the executable
+        run: |
+          pyinstaller --onefile --name rapl-energy-meter main.py
+          mv dist/rapl-energy-meter .  # Move executable to the root directory
+
+      - name: Create a ZIP archive of the source code
+        run: |
+          mkdir source_code
+          cp -r ./* source_code/
+          zip -r source_code.zip source_code
+
+      - name: Verify generated files
+        run: ls -lh
+
+      - name: Create a GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}  # Use the current tag
+          name: Release ${{ github.ref_name }}  # Release name
+          draft: false
+          prerelease: false
+          files: |
+            rapl-energy-meter  # The executable (moved from dist/)
+            source_code.zip    # The ZIP archive of the source code
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

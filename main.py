@@ -8,7 +8,7 @@ import csv
 from collections import defaultdict
 from datetime import datetime
 
-# Registres RAPL
+#  Registres RAPL
 MSR_RAPL_POWER_UNIT = 0x606
 MSR_PKG_ENERGY_STATUS = 0x611
 MSR_PP0_ENERGY_STATUS = 0x639  # CPU cores

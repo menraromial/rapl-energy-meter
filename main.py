@@ -14,6 +14,8 @@ MSR_PKG_ENERGY_STATUS = 0x611
 MSR_PP0_ENERGY_STATUS = 0x639  # CPU cores
 MSR_PP1_ENERGY_STATUS = 0x641  # Integrated GPU
 MSR_DRAM_ENERGY_STATUS = 0x619  # DRAM
+MSR_PSYS_ENERGY_STATUS = 0x64d  # Platform/System level power (available on some systems)
+
 
 class RaplDomain:
     def __init__(self, name, msr_address):
@@ -34,8 +36,9 @@ class ProcessEnergyTracer:
         self.domains = {
             'package': RaplDomain('Package', MSR_PKG_ENERGY_STATUS),
             'cpu': RaplDomain('CPU Cores', MSR_PP0_ENERGY_STATUS),
-            'gpu': RaplDomain('Integrated GPU', MSR_PP1_ENERGY_STATUS),
-            'dram': RaplDomain('DRAM', MSR_DRAM_ENERGY_STATUS)
+            'uncore': RaplDomain('Uncore', MSR_PP1_ENERGY_STATUS),
+            'dram': RaplDomain('DRAM', MSR_DRAM_ENERGY_STATUS),
+            'psys': RaplDomain('Platform Total', MSR_PSYS_ENERGY_STATUS)
         }
         self._initialize_rapl()
     
@@ -141,15 +144,16 @@ class ProcessEnergyTracer:
         energy_file = os.path.join(self.output_dir, f"{base_filename}_energy.csv")
         with open(energy_file, 'w', newline='') as f:
             writer = csv.writer(f)
-            writer.writerow(['timestamp', 'package', 'core', 'gpu', 'dram', 'cpu'])
+            writer.writerow(['timestamp', 'package', 'core', 'uncore', 'dram','psys', 'cpu'])
             
             for t in sorted(energy_data.keys(), key=float):
                 writer.writerow([
                     t,
                     f"{energy_data[t].get('package', 0):.6f}",
                     f"{energy_data[t].get('cpu', 0):.6f}",
-                    f"{energy_data[t].get('gpu', 0):.6f}",
+                    f"{energy_data[t].get('uncore', 0):.6f}",
                     f"{energy_data[t].get('dram', 0):.6f}",
+                    f"{energy_data[t].get('psys', 0):.6f}",
                     cpu_data[t]
                 ])
         
@@ -157,15 +161,16 @@ class ProcessEnergyTracer:
         power_file = os.path.join(self.output_dir, f"{base_filename}_power.csv")
         with open(power_file, 'w', newline='') as f:
             writer = csv.writer(f)
-            writer.writerow(['timestamp', 'package', 'core', 'gpu', 'dram', 'cpu'])
+            writer.writerow(['timestamp', 'package', 'core', 'uncore', 'dram','psys', 'cpu'])
             
             for t in sorted(power_data.keys(), key=float):
                 writer.writerow([
                     t,
                     f"{power_data[t].get('package', 0):.6f}",
                     f"{power_data[t].get('cpu', 0):.6f}",
-                    f"{power_data[t].get('gpu', 0):.6f}",
+                    f"{power_data[t].get('uncore', 0):.6f}",
                     f"{power_data[t].get('dram', 0):.6f}",
+                    f"{power_data[t].get('psys', 0):.6f}",
                     cpu_data[t]
                 ])
         

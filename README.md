@@ -25,7 +25,7 @@ This Python script traces the energy consumption of a specified process using RA
 
 1. Download the pre-built binary:
 ```bash
-wget https://github.com/menraromial/rapl-energy-meter/releases/download/v1.0.0/rapl-energy-meter
+wget https://github.com/menraromial/rapl-energy-meter/releases/download/<version>/rapl-energy-meter
 ```
 
 2. Make the binary executable:

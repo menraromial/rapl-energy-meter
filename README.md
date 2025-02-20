@@ -103,7 +103,7 @@ When CSV export is enabled, the script generates three files:
 
 #### Energy/Power CSV
 ```
-timestamp,package,core,gpu,dram,cpu
+timestamp,package,core,uncore,dram,cpu
 0.000,0.123456,0.098765,0.045678,0.034567,0
 1.001,0.234567,0.187654,0.056789,0.045678,2
 ...
@@ -124,8 +124,9 @@ The script uses RAPL MSR (Model-Specific Registers) to access energy consumption
 - `MSR_RAPL_POWER_UNIT (0x606)`: Power units
 - `MSR_PKG_ENERGY_STATUS (0x611)`: Package energy
 - `MSR_PP0_ENERGY_STATUS (0x639)`: CPU cores energy
-- `MSR_PP1_ENERGY_STATUS (0x641)`: GPU energy
+- `MSR_PP1_ENERGY_STATUS (0x641)`: Uncore energy
 - `MSR_DRAM_ENERGY_STATUS (0x619)`: DRAM energy
+- `MSR_PSYS_ENERGY_STATUS (0x64d)`: Psys
 
 ## Limitations
 

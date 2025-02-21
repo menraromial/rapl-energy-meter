@@ -26,13 +26,14 @@ class RaplDomain:
         self.intervals = []
 
 class ProcessEnergyTracer:
-    def __init__(self, pid, sample_interval=1.0, verbose_level=0, export_csv=False, output_dir=None):
+    def __init__(self, pid=None, sample_interval=1.0, verbose_level=0, export_csv=False, output_dir=None):
         self.pid = pid
         self.cpu = 0
         self.verbose = verbose_level
         self.sample_interval = sample_interval
         self.export_csv = export_csv
         self.output_dir = output_dir
+        
         self.domains = {
             'package': RaplDomain('Package', MSR_PKG_ENERGY_STATUS),
             'cpu': RaplDomain('CPU Cores', MSR_PP0_ENERGY_STATUS),
@@ -81,6 +82,9 @@ class ProcessEnergyTracer:
 
     def get_process_info(self):
         """Get detailed process information"""
+        if self.pid is None:
+            return None
+        
         try:
             self.debug(2, f"Reading information for PID {self.pid}")
             
@@ -233,14 +237,13 @@ class ProcessEnergyTracer:
                 
                 if elapsed >= self.sample_interval:
                     info = self.get_process_info()
-                    if info is None:
-                        self.debug(1, "Process terminated")
-                        break
-                    
                     current_readings = self.read_energy_all_domains()
-                    runtime_diff = info['runtime'] - last_runtime
-                    
-                    self.debug(2, f"Runtime diff: {runtime_diff/1e9:.3f}s")
+                    runtime_diff = 0
+
+                    if info:
+                        self.debug(1, "Process terminated")
+                        runtime_diff = info['runtime'] - last_runtime
+                        self.debug(2, f"Runtime diff: {runtime_diff/1e9:.3f}s")
                     
                     if runtime_diff > 0:
                         print(f"\nElapsed time: {current_time - start_time:.1f}s")
@@ -248,7 +251,10 @@ class ProcessEnergyTracer:
                         if self.verbose >= 1:
                             print(f"Context switches - V: {info['voluntary_switches']}, NV: {info['nonvoluntary_switches']}")
                         print(f"CPU time used: {runtime_diff/1e9:.3f}s")
-                        
+
+
+                    if runtime_diff > 0 or self.pid is None:
+
                         for domain_name in current_readings.keys():
                             energy_diff = current_readings[domain_name] - last_readings[domain_name]
                             power = energy_diff / elapsed
@@ -265,11 +271,12 @@ class ProcessEnergyTracer:
                                 'time': current_time - start_time,
                                 'energy': energy_diff,
                                 'power': power,
-                                'cpu': info['cpu']
+                                'cpu': info['cpu'] if self.pid else self.cpu
                             })
                             self.domains[domain_name].total_energy += energy_diff
                     
-                    last_runtime = info['runtime']
+                    if self.pid:
+                        last_runtime = info['runtime']
                     last_readings = current_readings
                     last_check_time = current_time
                 
@@ -306,8 +313,9 @@ class ProcessEnergyTracer:
 
 def main():
     parser = argparse.ArgumentParser(description='RAPL energy tracer for processes')
-    parser.add_argument('pid', type=int, help='PID of process to trace')
+    #parser.add_argument('pid', type=int, help='PID of process to trace')
     parser.add_argument('duration', type=float, help='Trace duration in seconds')
+    parser.add_argument('-p', '--pid', type=int, help='PID of process to monitor (optional)')
     parser.add_argument('-i', '--interval', type=float, default=1.0,
                         help='Sampling interval in seconds (default: 1.0, min: 0.001)')
     parser.add_argument('-v', '--verbose', action='count', default=0,
@@ -326,8 +334,14 @@ def main():
         print("This program must be run with sudo")
         sys.exit(1)
 
-    tracer = ProcessEnergyTracer(args.pid, args.interval, args.verbose, args.csv, args.output_dir)
-    tracer.trace_energy(args.duration)
+    tracer = ProcessEnergyTracer(
+        pid=args.pid, 
+        sample_interval=args.interval, 
+        verbose_level=args.verbose, 
+        export_csv=args.csv, 
+        output_dir=args.output_dir
+        )
+    tracer.trace_energy(duration=args.duration)
 
 if __name__ == "__main__":
     main()

@@ -56,19 +56,19 @@ sudo modprobe msr
 ### Using the Binary
 
 ```bash
-sudo ./rapl-energy-meter PID DURATION [OPTIONS]
+sudo ./rapl-energy-meter DURATION [OPTIONS]
 ```
 
 ### Using the Python Script
 
 Basic usage:
 ```bash
-sudo python3 main.py PID DURATION
+sudo python3 main.py DURATION
 ```
 
 Full options:
 ```bash
-sudo python3 main.py [-h] [-i INTERVAL] [-v] [--csv] [--output-dir OUTPUT_DIR] pid duration
+sudo python3 main.py [-h] [-i INTERVAL] [-v] [--csv] [--output-dir OUTPUT_DIR] [-p pid] duration
 ```
 
 ### Arguments
@@ -85,10 +85,10 @@ sudo python3 main.py [-h] [-i INTERVAL] [-v] [--csv] [--output-dir OUTPUT_DIR] p
 Monitor process 1234 for 60 seconds with 0.5s sampling interval and CSV export:
 ```bash
 # Using binary
-sudo ./rapl-energy-meter 1234 60 -i 0.5 --csv
+sudo ./rapl-energy-meter 60 -p 1234 -i 0.5 --csv
 
 # Using Python script
-sudo python3 main.py 1234 60 -i 0.5 --csv
+sudo python3 main.py 60 -p 1234 -i 0.5 --csv
 ```
 
 ## Output Files

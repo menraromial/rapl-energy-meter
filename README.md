@@ -73,7 +73,7 @@ sudo python3 main.py [-h] [-i INTERVAL] [-v] [--csv] [--output-dir OUTPUT_DIR] [
 
 ### Arguments
 
-- `pid`: Process ID to monitor
+- `-p`: Process ID to monitor
 - `duration`: Duration of monitoring in seconds
 - `-i, --interval`: Sampling interval in seconds (default: 1.0, minimum: 0.001)
 - `-v`: Increase verbosity level (can be repeated)
@@ -150,4 +150,4 @@ This project is licensed under the BSD 2-Clause License - see the LICENSE file f
 
 ## Authors
 
-- Menra W. Romial (@menraromial)
+- Menra W. Romial ([@menraromial](https://github.com/menraromial))
